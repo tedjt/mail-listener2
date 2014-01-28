@@ -1,7 +1,7 @@
 var MailListener = require("./");
 
 var mailListener = new MailListener({
-  username: "xxxx",
+  username: "xxx",
   password: "xxx",
   host: "imap.gmail.com",
   port: 993,
@@ -9,7 +9,7 @@ var mailListener = new MailListener({
   tlsOptions: { rejectUnauthorized: false },
   mailbox: "INBOX",
   markSeen: true,
-  fetchUnreadOnStart: true,
+  fetchUnreadOnStart: { sinceDate: new Date((new Date()).getTime() - 60 * 1000) },
   mailParserOptions: {streamAttachments: true}
 });
 

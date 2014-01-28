@@ -6,14 +6,14 @@ var MailParser = require("mailparser").MailParser;
 module.exports = MailListener;
 
 function MailListener(options) {
-  if (isObject(options.markSeen)) {
-    this.markSeen = true;
-    this.sinceDate = options.markSeen.sinceDate;
+  if (isObject(options.fetchUnreadOnStart)) {
+    this.fetchUnreadOnStart = true;
+    this.sinceDate = options.fetchUnreadOnStart.sinceDate;
   } else {
-    this.markSeen = !!options.markSeen;
+    this.fetchUnreadOnStart = !!options.fetchUnreadOnStart;
   }
   this.mailbox = options.mailbox || "INBOX";
-  this.fetchUnreadOnStart = !!options.fetchUnreadOnStart;
+  this.markSeen = !!options.markSeen;
   this.mailParserOptions = options.mailParserOptions || {},
   this.imap = new Imap({
     xoauth2: options.xoauth2,
@@ -24,7 +24,7 @@ function MailListener(options) {
     tls: options.tls,
     tlsOptions: options.tlsOptions || {}
   });
-  
+
   this.imap.once('ready', imapReady.bind(this));
   this.imap.once('close', imapClose.bind(this));
   this.imap.on('error', imapError.bind(this));
