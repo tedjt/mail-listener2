@@ -6,7 +6,12 @@ var MailParser = require("mailparser").MailParser;
 module.exports = MailListener;
 
 function MailListener(options) {
-  this.markSeen = !!options.markSeen;
+  if (isObject(options.markSeen)) {
+    this.markSeen = true;
+    this.sinceDate = options.markSeen.sinceDate;
+  } else {
+    this.markSeen = !!options.markSeen;
+  }
   this.mailbox = options.mailbox || "INBOX";
   this.fetchUnreadOnStart = !!options.fetchUnreadOnStart;
   this.mailParserOptions = options.mailParserOptions || {},
@@ -43,7 +48,7 @@ function imapReady() {
     } else {
       self.emit('server:connected');
       if(self.fetchUnreadOnStart) {
-        parseUnread.call(self);
+        parseUnread.call(self, self.sinceDate);
       }
       self.imap.on('mail', imapMail.bind(self));
     }
@@ -62,9 +67,11 @@ function imapMail() {
   parseUnread.call(this);
 }
 
-function parseUnread() {
+function parseUnread(date) {
   var self = this;
-  this.imap.search([ 'UNSEEN' ], function(err, results) {
+  var query = [ 'UNSEEN' ];
+  if (date) query.push([ 'SINCE', date ]);
+  this.imap.search(query, function(err, results) {
     if (err) {
       self.emit('error',err);
     } else if(results.length > 0) {
@@ -83,4 +90,16 @@ function parseUnread() {
       });
     }
   });
+}
+
+/**
+ * Check if `obj` is an object.
+ *
+ * @param {Object} obj
+ * @return {Boolean}
+ * @api private
+ */
+
+function isObject(obj) {
+  return null != obj && 'object' == typeof obj;
 }

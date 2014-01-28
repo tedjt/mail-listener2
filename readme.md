@@ -1,6 +1,10 @@
 # Overview
 
-Mail-listener2 library for node.js. Get notification when new email arrived to inbox. Uses IMAP protocol.
+A version of [Mail Listener](https://github.com/chirag04/mail-listener2) that adds the ability to search back a certain number of unread messages. 
+
+# From Mail Listener
+
+Mail-listener2 library for node.js. Get notification when new email arrived to inbox. Uses IMAP protocol. 
 
 We are using these libraries: [node-imap](https://github.com/mscdex/node-imap), [mailparser](https://github.com/andris9/mailparser).
 
