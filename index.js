@@ -15,6 +15,7 @@ function MailListener(options) {
   this.mailbox = options.mailbox || "INBOX";
   this.markSeen = !!options.markSeen;
   this.mailParserOptions = options.mailParserOptions || {},
+  this.poll = options.poll
   this.imap = new Imap({
     xoauth2: options.xoauth2,
     user: options.username,
@@ -34,10 +35,12 @@ util.inherits(MailListener, EventEmitter);
 
 MailListener.prototype.start = function() {
   this.imap.connect();
+  this.connected = true;
 };
 
 MailListener.prototype.stop = function() {
   this.imap.end();
+  this.connected = false;
 };
 
 function imapReady() {
@@ -50,7 +53,19 @@ function imapReady() {
       if(self.fetchUnreadOnStart) {
         parseUnread.call(self, self.sinceDate);
       }
-      self.imap.on('mail', imapMail.bind(self));
+      if (this.poll) {
+        setInterval(function() {
+          if (self.imap.state !== 'disconnected') {
+            console.log('polling mail')
+            imapMail.bind(self)();
+          } else if (self.connected) {
+            console.log('restarting imap server');
+            self.start();
+          }
+        }, this.poll.interval);
+      } else {
+        self.imap.on('mail', imapMail.bind(self));
+      }
     }
   });
 }
