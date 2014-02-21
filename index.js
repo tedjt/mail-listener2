@@ -53,7 +53,7 @@ function imapReady() {
       if(self.fetchUnreadOnStart) {
         parseUnread.call(self, self.sinceDate);
       }
-      if (this.poll) {
+      if (self.poll) {
         setInterval(function() {
           if (self.imap.state !== 'disconnected') {
             console.log('polling mail')
@@ -62,7 +62,7 @@ function imapReady() {
             console.log('restarting imap server');
             self.start();
           }
-        }, this.poll.interval);
+        }, self.poll.interval);
       } else {
         self.imap.on('mail', imapMail.bind(self));
       }
